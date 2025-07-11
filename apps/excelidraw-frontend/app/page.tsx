@@ -1,9 +1,28 @@
+"use client";
+
 import { Button } from "@repo/ui/button";
 import { Card } from "@repo/ui/card";
 import { Pencil, Share2, Users2, Sparkles, Github, Download } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 function App() {
+  const router = useRouter();
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      setIsSignedIn(!!token);
+    }
+  }, []);
+
+  function handleOpenCanvas() {
+    const roomId = Math.floor(Math.random() * 1000000); // random 6-digit number
+    router.push(`/canvas/${roomId}`);
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -19,17 +38,36 @@ function App() {
               No sign-up required.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <Link href={"/signin"}>
-                <Button variant={"primary"} size="lg" className="h-12 px-6">
-                  Sign in
-                  <Pencil className="ml-2 h-4 w-4" />
+              {!isSignedIn && (
+                <>
+                  <Link href={"/signin"}>
+                    <Button variant={"primary"} size="lg" className="h-12 px-6">
+                      Sign in
+                      <Pencil className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/signup">
+                    <Button variant="outline" size="lg" className="h-12 px-6">
+                      Sign up
+                    </Button>
+                  </Link>
+                </>
+              )}
+              {isSignedIn && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-12 px-6"
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    setIsSignedIn(false);
+                    // Optionally, redirect to home or refresh
+                    // router.push("/");
+                  }}
+                >
+                  Sign out
                 </Button>
-              </Link>
-              <Link href="/signup">
-                <Button variant="outline" size="lg" className="h-12 px-6">
-                  Sign up
-                </Button>
-              </Link>
+              )}
             </div>
           </div>
         </div>
@@ -39,7 +77,7 @@ function App() {
       <section className="py-24 bg-muted/50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
-            <Card className="p-6 border-2 hover:border-primary transition-colors">
+            <Card className="p-6 border-2 hover:border-primary transition-colors" title="Real-time Collaboration" href="https://example.com/real-time-collaboration">
               <div className="flex items-center gap-4">
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Share2 className="h-6 w-6 text-primary" />
@@ -51,7 +89,7 @@ function App() {
               </p>
             </Card>
 
-            <Card className="p-6 border-2 hover:border-primary transition-colors">
+            <Card className="p-6 border-2 hover:border-primary transition-colors" title="Multiplayer Editing" href="https://example.com/multiplayer-editing">
               <div className="flex items-center gap-4">
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Users2 className="h-6 w-6 text-primary" />
@@ -63,7 +101,7 @@ function App() {
               </p>
             </Card>
 
-            <Card className="p-6 border-2 hover:border-primary transition-colors">
+            <Card className="p-6 border-2 hover:border-primary transition-colors" title="Smart Drawing" href="https://example.com/smart-drawing">
               <div className="flex items-center gap-4">
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Sparkles className="h-6 w-6 text-primary" />
@@ -90,7 +128,7 @@ function App() {
                 Join thousands of users who are already creating amazing diagrams and sketches.
               </p>
               <div className="mt-10 flex items-center justify-center gap-x-6">
-                <Button size="lg" variant="secondary" className="h-12 px-6">
+                <Button size="lg" variant="secondary" className="h-12 px-6" onClick={handleOpenCanvas}>
                   Open Canvas
                   <Pencil className="ml-2 h-4 w-4" />
                 </Button>
